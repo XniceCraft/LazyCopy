@@ -80,8 +80,9 @@ class Worker:
         """
         try:
             os.symlink(src, dest)
+            logger.error(f"Success linking {src} to {dest}\n")
         except OSError:
-            logger.error(f"Failed to link {src} to {dest}")
+            logger.error(f"Failed to link {src} to {dest}\n")
 
     def copy_file(self, src: str, dest: str):
         """Copy the file
@@ -129,10 +130,10 @@ class Worker:
                     )
 
             self.close_bar()
-            logger.info(f"Success copying {src} to {dest}")
+            logger.info(f"Success copying {src} to {dest}\n")
         except Exception as e:  # pylint: disable=broad-exception-caught
             self.close_bar()
-            logger.error(f"Error copying {src} to {dest}: {e}")
+            logger.error(f"Error copying {src} to {dest}: {e}\n")
 
     def run(self, src_path: str, dest_path: str) -> None:
         """Run the copy program
@@ -183,6 +184,22 @@ def main():
         help="How large the buffer (bytes)",
         default=4096,
         type=int,
+    )
+    parser.add_argument(
+        "--max-latency",
+        metavar="ms",
+        help="How many ms for max write latency",
+        default=100,
+        type=int,
+    )
+    parser.add_argument(
+        "--priority",
+        metavar="type",
+        help="What you would prioritize?",
+        default="latency",
+        const="latency",
+        nargs="?",
+        choices = ["latency", "chunksize"]
     )
     parser.add_argument("source", metavar="src", help="Source file or dir")
     parser.add_argument("destination", metavar="dest", help="Destination dir or file name")
